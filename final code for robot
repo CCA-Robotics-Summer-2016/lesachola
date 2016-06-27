@@ -1,0 +1,129 @@
+/*
+  Using Arduino to control both halves of an H-bridge
+  and two motors
+
+  This program corresponds to the schematics here:
+  Arduino Tutorial: How to use an H-Bridge with Arduino to control a permanent magnet DC motor
+  and here:
+  Arduino Tutorial: How to use an H-Bridge with Arduino to control a permanent magnet DC motor
+*/
+
+// The "const" keyword prevents these variables from changing
+// Control pins for the left half of the H-bridge
+// I would add the word "left" or "right to the variable
+// names but I want to use exactly the same names that are on
+// the schematics
+const int enable1 = 6; // PWM pin for speed control
+const int in1 = 4;
+const int in2 = 2;
+// Control pins for the right half of the H-bridge
+const int enable2 = 5; // PWM pin for speed control
+const int in3 = 8;
+const int in4 = 7;
+// control pins for microphone
+const int DO = 13; //Pin for Digital Output - DO
+const int DA = A0; // Pin for Analog Output - AO
+const int threshold = 255; //Set minimum threshold for LED lit
+int sensorvalue;
+
+void setup () {
+  Serial.begin(9600);
+  // pins for left motor
+  pinMode( enable1, OUTPUT);
+  pinMode( in1, OUTPUT);
+  pinMode( in2, OUTPUT);
+
+  // pins for right motor
+  pinMode( enable2, OUTPUT);
+  pinMode( in3, OUTPUT);
+  pinMode( in4, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop () {
+  sensorvalue = analogRead(DA);  //Read the analog value
+  Serial.print("Analog: ");
+  Serial.print(sensorvalue);  //Print the analog value
+  Serial.print("  ");
+  Serial.print("Digital:3 ");
+  Serial.println(digitalRead(DO));
+
+
+  if (sensorvalue >= threshold) {
+    stopRobot (500);
+    goReverse(500);
+    turnLeft(500);
+    goForward (2000);
+  }
+
+  else
+
+  {
+    stopRobot (500);
+    goReverse (500);
+    turnRight (500);
+    goForward (2000);
+  }
+
+}
+
+
+
+//The section that follows is used to define the functions used in this code loop
+void goForward (int timeToMove) {
+
+  digitalWrite (in1, HIGH);
+  digitalWrite (in2, LOW);
+  digitalWrite (enable1, HIGH);
+  digitalWrite (in3, HIGH);
+  digitalWrite (in4, LOW);
+  digitalWrite (enable2, HIGH);
+  delay (timeToMove);
+}
+
+void turnLeft (int timeToMove) {
+
+  digitalWrite (in1, HIGH);
+  digitalWrite (in2, LOW);
+  analogWrite (enable1, 150);
+  digitalWrite (in3, HIGH);
+  digitalWrite (in4, LOW);
+  analogWrite (enable2, 100);
+  delay (timeToMove);
+}
+
+void turnRight (int timeToMove) {
+
+  digitalWrite (in1, HIGH);
+  digitalWrite (in2, LOW);
+  analogWrite (enable1, 100);
+  digitalWrite (in3, HIGH);
+  digitalWrite (in4, LOW);
+  analogWrite (enable2, 150);
+  delay (timeToMove);
+}
+
+void stopRobot (int timeToMove) {
+
+  //both motors stop
+  digitalWrite (in1, LOW);
+  digitalWrite (in2, LOW);
+  digitalWrite (enable1, LOW);
+  digitalWrite (in3, LOW);
+  digitalWrite (in4, LOW);
+  digitalWrite (enable2, LOW);
+  delay (timeToMove); // wait for humans to enjoy the bot stopping
+}
+
+void goReverse (int timeToMove) {
+  //Go backward for a certain abmount of time
+
+  //both motors go in reverse
+  digitalWrite (in1, LOW);
+  digitalWrite (in2, HIGH);
+  digitalWrite (enable1, HIGH);
+  digitalWrite (in3, LOW);
+  digitalWrite (in4, HIGH);
+  digitalWrite (enable2, HIGH);
+  delay (timeToMove); // wait for humans to enjoy the bot going in reverse
+}
